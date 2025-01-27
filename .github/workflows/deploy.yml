@@ -1,0 +1,71 @@
+name: Deploy Django to AWS EC2
+
+on:
+  push:
+    branches:
+      - main  # Trigger on push to the main branch
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout the code
+      uses: actions/checkout@v2
+
+    - name: Set up Python environment
+      uses: actions/setup-python@v2
+      with:
+        python-version: '3.8'  # Use the Python version you need
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+
+    - name: Run tests (optional)
+      run: |
+        python manage.py test  # Ensure your tests pass before deployment
+
+    - name: Build and collect static files
+      run: |
+        python manage.py collectstatic --noinput
+
+    - name: Upload Django settings to AWS (optional step)
+      run: |
+        # Upload any environment-specific settings to AWS if needed
+        # For example, for RDS or S3 setup
+        aws s3 cp settings.py s3://your-bucket-name/ --region ${{ secrets.AWS_REGION }}
+
+    - name: Deploy to AWS EC2
+      env:
+        EC2_HOST: ${{ secrets.EC2_HOST }}
+        SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+        AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        AWS_REGION: ${{ secrets.AWS_REGION }}
+      run: |
+        echo "$SSH_PRIVATE_KEY" > private_key.pem
+        chmod 600 private_key.pem
+
+        # SSH into the EC2 instance and deploy
+        ssh -o StrictHostKeyChecking=no -i private_key.pem ubuntu@$EC2_HOST << 'EOF'
+          # Navigate to the Django app directory
+          cd /path/to/your/django/app
+
+          # Pull the latest code from GitHub (if using git to manage your app)
+          git pull origin main
+
+          # Install the required dependencies
+          source /path/to/your/virtualenv/bin/activate
+          pip install -r requirements.txt
+
+          # Apply migrations
+          python manage.py migrate
+
+          # Restart the application (e.g., Gunicorn or Apache/Nginx)
+          sudo systemctl restart gunicorn
+
+          # Or restart Nginx (if needed)
+          sudo systemctl restart nginx
+        EOF
