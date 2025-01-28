@@ -7,7 +7,7 @@ on:
 
 jobs:
   deploy:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04  # Specify the runner version explicitly
 
     steps:
     - name: Checkout the code
@@ -20,10 +20,14 @@ jobs:
         aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         aws-region: eu-north-1
 
-    - name: Install AWS CLI
+    - name: Install dependencies
       run: |
         sudo apt-get update
         sudo apt-get install -y awscli
+
+    - name: Collect static files
+      run: |
+        python manage.py collectstatic --noinput
 
     - name: Sync static files to S3
       run: |
