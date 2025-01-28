@@ -1,27 +1,27 @@
-# name: Deploy Django 
+name: Deploy Django 
 
-# on:
-#   push:
-#     branches:
-#       - main  # Trigger on push to the main branch
+on:
+  push:
+    branches:
+      - main  # Trigger on push to the main branch
 
-# jobs:
-#   deploy:
-#     runs-on: ubuntu-latest
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
 
-#     steps:
-#     - name: Checkout the code
-#       uses: actions/checkout@v2
+    steps:
+    - name: Checkout the code
+      uses: actions/checkout@v2
 
-#     - name: Configure AWS Credentials
-#       user: aws-actions/configure-aws-credentials@v2
-#       with:
-#         AWS-ACCESS-KEY-ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-#         AWS-SECRET-ACCESS-KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-#         aws-region: eu-north-1
+    - name: Configure AWS Credentials
+      user: aws-actions/configure-aws-credentials@v2
+      with:
+        AWS-ACCESS-KEY-ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        AWS-SECRET-ACCESS-KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-region: eu-north-1
 
-#     - name: Deploy static site to S3 bucket
-#       run: aws s3 sunc . s3://deepsek --delete
+    - name: Deploy static site to S3 bucket
+      run: aws s3 sunc . s3://deepsek --delete
       
 
 
@@ -39,36 +39,36 @@
 
 
 
-name: Deploy Django Static Files to S3
+# name: Deploy Django Static Files to S3
 
-on:
-  push:
-    branches:
-      - main  # Trigger on push to the main branch
+# on:
+#   push:
+#     branches:
+#       - main  # Trigger on push to the main branch
 
-jobs:
-  deploy:
-    runs-on: ubuntu-latest
+# jobs:
+#   deploy:
+#     runs-on: ubuntu-latest
 
-    steps:
-    - name: Checkout the code
-      uses: actions/checkout@v2
+#     steps:
+#     - name: Checkout the code
+#       uses: actions/checkout@v2
 
-    - name: Configure AWS Credentials
-      uses: aws-actions/configure-aws-credentials@v2
-      with:
-        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-        aws-region: eu-north-1
+#     - name: Configure AWS Credentials
+#       uses: aws-actions/configure-aws-credentials@v2
+#       with:
+#         aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+#         aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+#         aws-region: eu-north-1
 
-    - name: Install AWS CLI
-      run: |
-        sudo apt-get update
-        sudo apt-get install -y awscli
+#     - name: Install AWS CLI
+#       run: |
+#         sudo apt-get update
+#         sudo apt-get install -y awscli
 
-    - name: Sync static files to S3
-      run: |
-        aws s3 sync ./staticfiles s3://deepsek --delete
+#     - name: Sync static files to S3
+#       run: |
+#         aws s3 sync ./staticfiles s3://deepsek --delete
 
 
 
